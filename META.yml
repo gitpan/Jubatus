@@ -1,0 +1,37 @@
+---
+abstract: 'Perl extension for interfacing with Jubatus, a distributed processing framework and streaming machine learning library.'
+author:
+  - 'Toshinori Sato (@overlast).'
+build_requires:
+  AnyEvent::MPRPC: 0.20
+  Data::MessagePack: 0.47
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.6, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jubatus
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+requires:
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/overlast/p5-Jubatus/issues
+  homepage: https://github.com/overlast/p5-Jubatus
+  repository: git://github.com/overlast/p5-Jubatus.git
+version: 0.0.0_01
+x_contributors:
+  - 'Toshinori Sato (@overlast) <overlasting@gmail.com>'

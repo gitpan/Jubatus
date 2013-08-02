@@ -1,0 +1,69 @@
+{
+   "abstract" : "Perl extension for interfacing with Jubatus, a distributed processing framework and streaming machine learning library.",
+   "author" : [
+      "Toshinori Sato (@overlast)."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.6",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Jubatus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::MPRPC" : "0.20",
+            "Data::MessagePack" : "0.47",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/overlast/p5-Jubatus/issues"
+      },
+      "homepage" : "https://github.com/overlast/p5-Jubatus",
+      "repository" : {
+         "url" : "git://github.com/overlast/p5-Jubatus.git",
+         "web" : "https://github.com/overlast/p5-Jubatus"
+      }
+   },
+   "version" : "0.0.0_01",
+   "x_contributors" : [
+      "Toshinori Sato (@overlast) <overlasting@gmail.com>"
+   ]
+}
