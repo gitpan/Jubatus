@@ -18,6 +18,7 @@ lib/Jubatus/Anomaly/Client.pm
 lib/Jubatus/Anomaly/Types.pm
 lib/Jubatus/Classifier/Client.pm
 lib/Jubatus/Classifier/Types.pm
+lib/Jubatus/Common/Datum.pm
 lib/Jubatus/Graph/Client.pm
 lib/Jubatus/Graph/Types.pm
 lib/Jubatus/NearestNeighbor/Client.pm
@@ -41,6 +42,7 @@ t/06_Jubatus_Graph_Client.t
 t/07_Juabatus_Anomaly_Client.t
 t/09_Jubatus_NearestNeighbor_Client.t
 t/10_Jubatus.t
+t/11_Jubatus_Common_Datum.t
 tmpl/anomaly_client.pod
 tmpl/anomaly_types.pod
 tmpl/classifier_client.pod
