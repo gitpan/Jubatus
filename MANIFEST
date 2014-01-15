@@ -7,6 +7,7 @@ bin/generate-jubatus-pm.pl
 bin/insert_pod.pl
 conf/boot_anomaly.json
 conf/boot_classifier.json
+conf/boot_clustering.json
 conf/boot_graph.json
 conf/boot_nearest_neighbor.json
 conf/boot_recommender.json
@@ -18,11 +19,18 @@ lib/Jubatus/Anomaly/Client.pm
 lib/Jubatus/Anomaly/Types.pm
 lib/Jubatus/Classifier/Client.pm
 lib/Jubatus/Classifier/Types.pm
+lib/Jubatus/Clustering/Client.pm
+lib/Jubatus/Clustering/Types.pm
+lib/Jubatus/Common.pm
+lib/Jubatus/Common/Client.pm
 lib/Jubatus/Common/Datum.pm
+lib/Jubatus/Common/MessageStringGenerator.pm
+lib/Jubatus/Common/Types.pm
 lib/Jubatus/Graph/Client.pm
 lib/Jubatus/Graph/Types.pm
 lib/Jubatus/NearestNeighbor/Client.pm
 lib/Jubatus/NearestNeighbor/Types.pm
+lib/Jubatus/Recommender.pm
 lib/Jubatus/Recommender/Client.pm
 lib/Jubatus/Recommender/Types.pm
 lib/Jubatus/Regression/Client.pm
@@ -40,6 +48,7 @@ t/04_Jubatus_Classifier_Client.t
 t/05_Jubatus_Stat_Client.t
 t/06_Jubatus_Graph_Client.t
 t/07_Juabatus_Anomaly_Client.t
+t/08_Jubatus_Clustering_Client.t
 t/09_Jubatus_NearestNeighbor_Client.t
 t/10_Jubatus.t
 t/11_Jubatus_Common_Datum.t

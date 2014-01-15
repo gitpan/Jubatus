@@ -5,41 +5,136 @@ use warnings;
 use utf8;
 use autodie;
 
+require Jubatus::Common::Types;
+use Jubatus::Common::MessageStringGenerator;
+
+our $TYPE = Jubatus::Common::TTuple->new([
+    Jubatus::Common::TList->new(
+        Jubatus::Common::TTuple->new([
+            Jubatus::Common::TString->new(), Jubatus::Common::TString->new()])),
+    Jubatus::Common::TList->new(
+        Jubatus::Common::TTuple->new([
+            Jubatus::Common::TString->new(), Jubatus::Common::TFloat->new()])),
+    Jubatus::Common::TList->new(
+        Jubatus::Common::TTuple->new([
+            Jubatus::Common::TString->new(), Jubatus::Common::TRaw->new()])),
+]);
+
 sub new {
-  my ($self, $string_values, $num_values) = @_;
-  my %hash = (
-    'string_values' => $self->hash_ref_to_array_ref($string_values),
-    'num_values' => $self->hash_ref_to_array_ref($num_values),
-  );
-  bless \%hash, $self;
+    my ($self, $label_value_pairs) = @_;
+    my ($string_values, $num_values, $binary_values) = ([], [], []);
+    # $self->hash_ref_to_array_ref($string_values),
+    if ((defined $label_value_pairs) && (ref $label_value_pairs eq "ARRAY")) {
+        for (my $i = 0; $i <= $#$label_value_pairs; $i++) {
+            # $label_value_pairs->[$i] = [label(String), value(Any type)]
+            my $type = Jubatus::Common::Types::estimate_type($label_value_pairs->[$i]->[1]);
+            if ($type eq "String") {
+                push @{$string_values}, $label_value_pairs->[$i];
+            } elsif ($type eq "Integer") {
+                my $tmp_float = [$label_value_pairs->[$i]->[0] , 1.1 + $label_value_pairs->[$i]->[1] - 1.1];
+                push @{$num_values}, $tmp_float;
+            } elsif ($type eq "Float") {
+                push @{$num_values}, $label_value_pairs->[$i];
+            } else {
+                Jubatus::Common::TypeException->show([$label_value_pairs->[$i]->[1], $type]);
+            }
+        }
+    } elsif ((defined $label_value_pairs) && (ref $label_value_pairs eq "HASH")) {
+        foreach my $key (keys %{$label_value_pairs}) {
+            # $label_value_pairs->[$i] = [label(String), value(Any type)]
+            my $type = Jubatus::Common::Types::estimate_type($label_value_pairs->{$key});
+            if ($type eq "String") {
+                my $tmp_string = [$key, $label_value_pairs->{$key}];
+                push @{$string_values}, $tmp_string;
+            } elsif ($type eq "Integer") {
+                my $tmp_float = [$key, 1.1 + $label_value_pairs->{$key} - 1.1];
+                push @{$num_values}, $tmp_float;
+            } elsif ($type eq "Float") {
+                my $tmp_float = [$key, 1.1 + $label_value_pairs->{$key} - 1.1];
+                push @{$num_values}, $tmp_float;
+            } else {
+                Jubatus::Common::TypeException->show([$label_value_pairs->{$key}, $type]);
+            }
+        }
+    }
+    my %hash = (
+        'type' => "Jubatus::Common::Datum",
+        'string_values' => $string_values,
+        'num_values' => $num_values,
+        'binary_values' => $binary_values,
+    );
+    bless \%hash, $self;
+}
+
+sub add_string {
+    my ($self, $key, $value) = @_;
+    my $done_add = 0;
+    if (Jubatus::Common::Type::check_type($key, "String")) {
+        if (Jubatus::Common::Type::check_type($value, "String")) {
+            push @{$self->{string_values}}, [$key, $value];
+            $done_add = 1;
+        }
+    }
+    return $done_add;
+}
+
+sub add_number {
+    my ($self, $key, $value) = @_;
+    my $done_add = 0;
+    if (Jubatus::Common::Type::check_type($key, "String")) {
+        my $value_type = (Jubatus::Common::Type::estimate_type($value));
+        if ($value_type eq "Float") {
+            push @{$self->{num_values}}, [$key, $value];
+            $done_add = 1;
+        } elsif ($value_type eq "Integer") {
+            push @{$self->{num_values}}, [$key, 1.1 + $value - 1.1];
+            $done_add = 1;
+        }
+    }
+    return $done_add;
+}
+
+sub add_binary {
+    my ($self, $key, $value) = @_;
+    my $done_add = 0;
+    if (Jubatus::Common::Type::check_type($key, "String")) {
+        if (Jubatus::Common::Type::check_type($value, "String")) {
+            push @{$self->{binary_values}}, [$key, $value];
+            $done_add = 1;
+        }
+    }
+    return $done_add;
 }
 
 sub to_msgpack {
-  my ($self) = @_;
-  return [
+    my ($self) = @_;
+    return [
         $self->{string_values},
         $self->{num_values},
-   ];
+        $self->{binary_values},
+    ];
 }
 
 sub from_msgpack {
-  my ($self, $arg) = @_;
-  my $datum = Jubatus::Common::Datum->new({ map { $_->[0] =>
-       $_->[1] } @{ $arg->[0] } }, { map { $_->[0] =>
-       $_->[1] } @{ $arg->[1] } });
-  return $datum;
+    my ($self, $arg) = @_;
+    my $value = $TYPE->from_msgpack($arg);
+    my $datum = Jubatus::Common::Datum->new();
+    $datum->{string_values} = $value->[0];
+    $datum->{num_values} = $value->[1];
+    $datum->{binary_values} = $value->[2];
+    return $datum;
 }
 
-sub hash_ref_to_array_ref {
-    my ($self, $hash_ref) = @_;
-    my $array_ref;
-    foreach my $key (keys %{$hash_ref}) {
-        my $value = $hash_ref->{$key};
-        my $tmp_arr_ref = [$key, $value];
-        push @{$array_ref}, $tmp_arr_ref;
-    }
-    return $array_ref;
-}
+sub to_s {
+    my ($self) = @_;
+    my $gen = Jubatus::Common::MessageStringGenerator->new();
+    $gen->open_buf("datum");
+    $gen->add_buf("string_values", $self->{string_values});
+    $gen->add_buf("num_values", $self->{num_values});
+    $gen->add_buf("binary_values", $self->{binary_values});
+    $gen->close_buf();
+    return $gen->to_str();
+ }
 
 1;
 
@@ -176,22 +271,27 @@ L<https://github.com/overlast/p5-Jubatus>
 
 =head1 LICENSE
 
-Copyright (C) 2013 by Toshinori Sato (@overlast).
+The MIT License (MIT)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Copyright (c) 2013 by Toshinori Sato (@overlast).
 
-The licence of Jubatus is LGPL 2.1.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    Jubatus: Online machine learning framework for distributed environment
-    Copyright (C) 2011,2012 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License version 2.1 as published by the Free Software Foundation.
-
-However Jubatus.pm and Jubatus::*.pm is the pure Perl modules.
-Therefor the licence of Jubatus.pm and Jubatus::*.pm is the Perl's licence.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 =head1 AUTHOR
 
